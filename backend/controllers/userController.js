@@ -67,6 +67,7 @@ export const loggIn = async (req, res) => {
 
 export const getUserProfile = async (req, res) => {
 	try {
+		// console.log("hidfsf",req.user,"higgg");
 		const userWithoutSensitiveData = {
 			id: req.user._id,
 			userName: req.user.userName,
@@ -83,6 +84,7 @@ export const getUserProfile = async (req, res) => {
 
 export const updateUserProfile = async (req, res) => {
 	try {
+		console.log(req.user,"kkkkkdfdsfs");
 		const user = await User.findById(req.user._id);
 
 		if (user) {

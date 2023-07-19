@@ -1,5 +1,6 @@
 import express from 'express'
-import { signUp ,loggIn ,logOut} from '../controllers/adminController.js';
+import { signUp ,loggIn ,getAllUsers, blockUnblockUser ,logOut} from '../controllers/adminController.js';
+import {adminAuth} from '../middlewares/authMiddleware.js'
 
 const router = express.Router();
 
@@ -8,6 +9,8 @@ router.post("/signup", signUp);
 
 //LOGGIN ADMIN
 router.post("/login", loggIn);
+router.get('/allUsers',adminAuth,getAllUsers);
+router.put('/handleBlock/:id',adminAuth,blockUnblockUser);
 
 //LOGOUT ADMIN
 router.post("/logout", logOut);

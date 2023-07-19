@@ -1,6 +1,7 @@
 import Admin from "../models/adminModel.js";
 import bcrypt from "bcrypt";
 import { generateAdminToken } from "../config/generateToken.js";
+import User from "../models/userModel.js";
 
 // REGISTER ADMIN
 export const signUp = async (req, res) => {
@@ -32,21 +33,17 @@ export const signUp = async (req, res) => {
 	}
 };
 
-
 //LOGGIN ADMIN
 export const loggIn = async (req, res) => {
-    try {
+	try {
 		const { email, password } = req.body;
 		const admin = await Admin.findOne({ email: email });
 		if (!admin)
 			return res.status(400).json({ error: "Invalid Credentials!" });
 
-
 		const isMatch = await bcrypt.compare(password, admin.password);
 		if (!isMatch)
-			return res
-				.status(400)
-				.json({ error: "invalid name or password" });
+			return res.status(400).json({ error: "invalid name or password" });
 
 		const adminWithoutSensitiveData = {
 			adminName: admin.adminName,
@@ -56,16 +53,40 @@ export const loggIn = async (req, res) => {
 		generateAdminToken(res, admin._id);
 		res.status(201).json({
 			message: "Loggined successfully...",
-			admin: adminWithoutSensitiveData ,
+			admin: adminWithoutSensitiveData,
 		});
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
 };
 
+export const getAllUsers = async (req, res) => {
+	try {
+		// console.log(req.admin,"kkkkkkkkkkk");
+		const users = await User.find({});
+		res.status(200).json({ users });
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
+};
+
+export const blockUnblockUser = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const user = await User.findById(id).select('-password');
+		console.log(user);
+		user.isBlocked = !user.isBlocked;
+		const afterUpdate = await user.save();
+		res.status(200).json({ message: `${afterUpdate.isBlocked ? "blocked" : "unblocked"}`,user:afterUpdate })
+	} catch (err) {
+		res.status(404).json({ error: err.message })
+	}
+
+}
+
 //LOGOUT ADMIN
 export const logOut = async (req, res) => {
-    try {
+	try {
 		res.cookie("jwtAdmin", "", {
 			httpOnly: true,
 			expires: new Date(0),
