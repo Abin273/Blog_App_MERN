@@ -13,9 +13,13 @@ import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 const app = express();
 dotenv.config();
 
-app.use(cors());
+app.use(cors({
+	origin: '*', // Replace with your React app's domain
+	credentials: true, // Allow credentials (cookies) to be included in requests
+  }));
+  
 app.use(morgan("dev"));
-app.use(express.urlencoded({ extended: false })); //for parsing form data
+app.use(express.urlencoded({ extended: true })); //for parsing form data
 app.use(express.json()); //for parsing json
 app.use(cookieParser());
 
@@ -26,9 +30,6 @@ app.use("/api/user", userRoutes);
 
 //admin router assigning
 app.use("/api/admin", adminRoutes);
-
-// app.use('/api/admin/auth', adminAuthRouter);
-// app.use('/api/admin/users', adminUserManagement);
 
 //blog router assigning
 app.use("/api/blog", blogRoutes);

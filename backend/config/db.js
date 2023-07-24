@@ -6,7 +6,7 @@ const connectDb =()=>{
         console.log("database connected successfully......");
     })
     .catch((error)=>{
-        console.log(error);
+        console.error(`Error: ${error.message}`);
     })
 } 
 

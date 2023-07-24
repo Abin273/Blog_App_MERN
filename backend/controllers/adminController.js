@@ -1,6 +1,6 @@
 import Admin from "../models/adminModel.js";
 import bcrypt from "bcrypt";
-import { generateAdminToken } from "../config/generateToken.js";
+import { generateAdminToken } from "../utils/generateToken.js";
 import User from "../models/userModel.js";
 
 // REGISTER ADMIN

@@ -1,14 +1,17 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
-import {generateToken} from "../config/generateToken.js";
+import { generateToken } from "../utils/generateToken.js";
 
-// REGISTER USER
+// @desc   signup user
+// @route  POST /api/user/signup
+// @access Public
 export const signUp = async (req, res) => {
 	try {
 		const { userName, email, password } = req.body;
 		const isUserExist = await User.findOne({ email: email });
 		if (isUserExist) {
-			return res.status(400).json({ error: "user already exist" });
+			res.status(400);
+			throw new Error("user already exist");
 		}
 
 		const saltRounds = 10;
@@ -32,13 +35,15 @@ export const signUp = async (req, res) => {
 	}
 };
 
-//LOGGIN USER
+// @desc   login user
+// @route  POST /api/user/login
+// @access Public
 export const loggIn = async (req, res) => {
 	try {
 		const { email, password } = req.body;
 		const user = await User.findOne({ email: email });
 		if (!user)
-			return res.status(400).json({ error: "Invalid Credentials!" });
+			return res.status(401).json({ error: "Invalid Credentials!" });
 
 		if (user.isBlocked)
 			return res.status(403).json({ error: "your account is blocked." });
@@ -50,6 +55,7 @@ export const loggIn = async (req, res) => {
 				.json({ error: "invalid userName or password" });
 
 		const userWithoutSensitiveData = {
+			id: user._id,
 			userName: user.userName,
 			email: user.email,
 			isBlocked: user.isBlocked,
@@ -65,15 +71,17 @@ export const loggIn = async (req, res) => {
 	}
 };
 
+// @desc   get user profile
+// @route  GET /api/user/profile
+// @access Private
 export const getUserProfile = async (req, res) => {
 	try {
-		// console.log("hidfsf",req.user,"higgg");
 		const userWithoutSensitiveData = {
 			id: req.user._id,
 			userName: req.user.userName,
 			email: req.user.email,
 		};
-		res.status(201).json({
+		res.status(200).json({
 			message: "user profile",
 			user: userWithoutSensitiveData,
 		});
@@ -82,9 +90,12 @@ export const getUserProfile = async (req, res) => {
 	}
 };
 
+// @desc   update user profile
+// @route  PUT /api/user/profile
+// @access Private
 export const updateUserProfile = async (req, res) => {
 	try {
-		console.log(req.user,"kkkkkdfdsfs");
+		console.log(req.user, "kkkkkdfdsfs");
 		const user = await User.findById(req.user._id);
 
 		if (user) {
@@ -109,14 +120,17 @@ export const updateUserProfile = async (req, res) => {
 				user: userWithoutSensitiveData,
 			});
 		} else {
-			res.status(404).json({ error: "user not found" });
+			res.status(404)
+			throw new Error("user not found");
 		}
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
 };
 
-//LOGOUT USER
+// @desc   logout user
+// @route  POST /api/user/logout
+// @access Public
 export const logOut = (req, res) => {
 	try {
 		res.cookie("jwt", "", {
