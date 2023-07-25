@@ -71,3 +71,27 @@ h1 {
 .user-table tr:hover {
   background-color: #e5e5e5;
 }
+
+
+td button {
+  display: block;
+  margin: 0 auto;
+  padding: 8px 16px;
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  border-radius: 5px;
+  width: 100px;
+}
+
+/* Styles for the "Block" button */
+.false {
+  background-color: red;
+}
+
+/* Styles for the "Unblock" button */
+.true {
+  background-color: green;
+}

@@ -1,13 +1,33 @@
 import React, { useState } from "react";
 import "./Signup.css";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 function Signup() {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const navigate = useNavigate();
 
-	const handleSignup = () => {};
-	const goToLogin = () => {};
+	const handleSignup = async(e) => {
+		e.preventDefault();
+		if(name === "" ||  email === '' || password === '') return;
+		try {
+			const admin = await axios.post("http://localhost:4000/api/admin/signup",{adminName:name,email,password});
+			console.log("admin after insert",admin);
+			if(!admin.data){
+				toast.error("admin already exist!");
+				navigate("/admin/signup")
+			}else{
+				toast.success(admin.data.message)
+				navigate("/admin")
+			}
+		} catch (error) {
+			toast.error(error.response.data.error)
+			console.error(error);
+		}
+	};
 
 	return (
 		<div className="container">
@@ -49,8 +69,8 @@ function Signup() {
 						Signup
 					</button>
 					<p>or</p>
-					<p className="alerady" onClick={goToLogin}>
-						Alerady have an account..
+					<p className="alerady">
+						<Link to="/admin/login">Alerady have an account..</Link>
 					</p>
 				</div>
 			</div>

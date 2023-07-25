@@ -47,6 +47,11 @@
     cursor: pointer;
 }
 
-.new{
-    cursor: pointer;
+.new {
+  cursor: pointer;
+}
+
+.new a{
+cursor: pointer;
+text-decoration: none;
 }

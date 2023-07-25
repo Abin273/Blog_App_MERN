@@ -1,20 +1,79 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./AdminHome.css";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function AdminHome() {
+	const [usersData, setUsersData] = useState([]);
+	const [filteredUsersData, setfilteredUsersData] = useState([]);
+	const [searchText, setSearchText] = useState("");
+
+	useEffect(() => {
+		(async () => {
+			const { data } = await axios.get("/api/admin/allUsers", {
+				withCredentials: true,
+			});
+			console.log("data", data);
+			console.log("data.users", data.users);
+
+			setUsersData(data.users);
+			setfilteredUsersData(data.users);
+		})();
+	}, []);
+
+	const handleSearch = (e) => {
+		setSearchText(e.target.value);
+
+		const data = usersData.filter((user) => {
+			return user.userName.includes(searchText);
+		});
+		setfilteredUsersData(data);
+	};
+
+	const handleBlockUnblock = (id) => {
+		(async () => {
+			const updatedUser = await axios.put(
+				`/api/admin/handleBlock/${id}`,
+				{
+					withCredentials: true,
+				}
+			);
+			// console.log("updatedUser", updatedUser);
+			toast.success(
+				updatedUser.data.users.isBlocked
+					? "User has blocked"
+					: "User has unBlocked"
+			);
+			let users = usersData.map((user) => {
+				if (user._id === id) {
+					return {
+						...user,
+						isBlocked: updatedUser.data.users.isBlocked,
+					};
+				}
+				return user;
+			});
+
+			setUsersData(users);
+			setfilteredUsersData(users);
+		})();
+	};
+
+	console.log(usersData);
 	return (
 		<div className="home-container">
 			<h1>Users</h1>
-			<div class="search-container">
+			<div className="search-container">
 				<input
 					type="text"
-					class="search-box"
+					className="search-box"
 					placeholder="Search by name . . ."
+					onChange={handleSearch}
 				/>
 			</div>
 
 			<div className="table-container">
-				<table class="user-table">
+				<table className="user-table">
 					<thead>
 						<tr>
 							<th>id</th>
@@ -24,18 +83,40 @@ function AdminHome() {
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
-							<td>1</td>
-							<td>John Doe</td>
-							<td>john@example.com</td>
-							<td>30</td>
-						</tr>
-						<tr>
-							<td>2</td>
-							<td>Jane Smith</td>
-							<td>jane@example.com</td>
-							<td>28</td>
-						</tr>
+						{filteredUsersData &&
+							filteredUsersData.map(
+								(
+									{ _id, userName, email, isBlocked },
+									index
+								) => (
+									<tr key={_id}>
+										<td>{index + 1}</td>
+										<td>{userName}</td>
+										<td>{email}</td>
+										<td>
+											{isBlocked ? (
+												<button
+													className={`${isBlocked}`}
+													onClick={() =>
+														handleBlockUnblock(_id)
+													}
+												>
+													Unblock
+												</button>
+											) : (
+												<button
+													className={`${isBlocked}`}
+													onClick={() =>
+														handleBlockUnblock(_id)
+													}
+												>
+													Block
+												</button>
+											)}
+										</td>
+									</tr>
+								)
+							)}
 					</tbody>
 				</table>
 			</div>

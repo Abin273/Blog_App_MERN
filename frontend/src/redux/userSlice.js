@@ -2,30 +2,29 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 export const userSlice = createSlice({
-    name:"user",
+    name: "user",
     initialState: {
-        id:null,
-        userName:"",
-        email:"",
-        isBlocked:false
+        userInfo: localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")) : null,
     },
-    reducers:{
-        login:(state,action)=>{
-            state.id=action.payload.id
-            state.userName = action.payload.userName
-            state.email = action.payload.email
-            state.isBlocked = action.payload.isBlocked
+    reducers: {
+        login: (state, action) => {
+            state.userInfo = action.payload;
+            console.log("state in slice", state.userInfo);
+            localStorage.setItem('userInfo',JSON.stringify(action.payload));
         },
 
-        update:(state,action)=>{
-            state.user = action.payload.user
+        update: (state, action) => {
+            state.userInfo = action.payload;
+            localStorage.removeItem('userInfo');
+            localStorage.setItem('userInfo',JSON.stringify(action.payload));
         },
 
-        logout:(state)=>{
-            state = null
+        logout: (state) => {
+            state.userInfo = null;
+            localStorage.removeItem('userInfo');
         }
     }
 })
 
-export const {login, update, logout}= userSlice.actions; //we can use it in login page
+export const { login, update, logout } = userSlice.actions; //we can use it in login page
 export default userSlice.reducer;

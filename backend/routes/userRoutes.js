@@ -7,12 +7,13 @@ import {
 	updateUserProfile,
 } from "../controllers/userController.js";
 import { userAuth } from "../middlewares/authMiddleware.js";
+import upload from "../middlewares/multer.js";
 
 const router = express.Router();
 
 
 // REGISTER USER
-router.post("/signup", signUp);
+router.post("/signup",upload.single('image'), signUp);
 
 //LOGGIN USER
 router.post("/login", loggIn);

@@ -3,37 +3,43 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 
-import {update} from "../../../redux/userSlice"
-
+import {update} from "../../../redux/userSlice";
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 function EditProfile() {
-	const user = useSelector(state => state.user);
+	const user = useSelector(state => state.user.userInfo);
 	console.log(user);
-	const [name, setName] = useState(user.name);
+	const [name, setName] = useState(user.userName);
 	const [email, setEmail] = useState(user.email);
 	const [password, setPassword] = useState("");
 	const dispatch = useDispatch();
+	const navigate = useNavigate()
 
 	const updatedUser = {
-		name,
+		userName:name,
 		email,
 		password
 	}
 
-	const handleUpdate = (e)=>{
+	const handleUpdate = async (e)=>{
 		e.preventDefault()
 		dispatch(update(updatedUser));
-
+		const response = await axios.put("/api/user/profile",updatedUser,{withCredentials:true});
+		console.log("ax res",user);
+		toast.success(response.data.message);
+		navigate("/user/profile")
 	}
 
   return (
     <div className="container">
 			<h1>Edit Profile</h1>
-			<div class="profile-container">
-				<div class="profile-image">
+			<div className="profile-container">
+				<div className="profile-image">
 					<img src="profile.jpg" alt="User Profile Image" />
 				</div>
-				<div class="profile-details">
+				<div className="profile-details">
 				<input
 					className="input"
 					type="text"
@@ -62,7 +68,7 @@ function EditProfile() {
 					}}
 				/>
 				</div>
-				<div class="edit-button">
+				<div className="edit-button">
 					<button onClick={handleUpdate} >Update</button>
 				</div>
 			</div>

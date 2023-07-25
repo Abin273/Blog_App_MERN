@@ -11,9 +11,9 @@ import { toast } from "react-toastify";
 function Login() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const navigate = useNavigate();
 
-	const dispatch = useDispatch()
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 
 	const handleLogin = async(e)=>{
@@ -21,25 +21,23 @@ function Login() {
 		if(email === "" || password === "") return;
 
 		try {
-			const {data} = await axios.post("http://localhost:4000/api/user/login",{email,password});
-			console.log("user",data);
-			console.log("user",data.user.email);
-			const stateData = {
-				id:data.user.id,
-				userName:data.user.userName,
-				email:data.user.email,
-				isBlocked:data.user.isBlocked
-			}
+			const {data} = await axios.post("/api/user/login",{email,password},{withCredentials:true});
+			console.log("user after axios",data);
 			if(!data.user){
-				toast.error("errr 1")
+				toast.error("errr 1",{position: toast.POSITION.TOP_CENTER})
 				navigate('/');
 			}else{
-				toast.success(data.message)
-				dispatch(login(stateData))
+				toast.success(data.message,{position: toast.POSITION.TOP_CENTER})
+				dispatch(login({
+					id:data.user.id,
+					userName:data.user.userName,
+					email:data.user.email,
+					isBlocked:data.user.isBlocked
+				}))
 				navigate('/user/home')
 			}
 		} catch (error) {
-			toast.error("errr 2")
+			toast.error(error.response.data.error || error.error,{position: toast.POSITION.TOP_CENTER})
 			console.error(error)
 		}
 

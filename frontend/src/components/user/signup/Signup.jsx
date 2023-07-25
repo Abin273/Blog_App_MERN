@@ -2,31 +2,35 @@ import React, { useState } from "react";
 import "./Signup.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {toast} from "react-toastify"
+import { toast } from "react-toastify";
 
 function Signup() {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [image, setImage] = useState(null);
 	const navigate = useNavigate();
-
-	const handleSignup = async(e) => {
+console.log("image",image);
+	const handleSignup = async (e) => {
 		e.preventDefault();
-		if(name === '' || email === '' || password === '') return;
+		if (name === "" || email === "" || password === "") return;
 		try {
-			const user = await axios.post("http://localhost:4000/api/user/signup",{ userName:name, email, password });
-			console.log("inserted",user);
-			if(!user.data){
-				toast.error("user already exist")
-				navigate('/signup')
-			}else{
-				toast.success(user.data.message);
-				navigate('/');
+			const user = await axios.post(
+				"http://localhost:4000/api/user/signup",
+				{ userName: name, email, password ,image}
+			);
+			console.log("inserted", user);
+			if (!user.data) {
+				toast.error("user already exist",{position: toast.POSITION.TOP_CENTER});
+				navigate("/signup");
+			} else {
+				toast.success(user.data.message,{position: toast.POSITION.TOP_CENTER});
+				navigate("/");
 			}
 		} catch (error) {
 			console.log("errrrrrrrrrrrrr");
-			toast.error("error")
-			console.log(error);
+			toast.error("error",{position: toast.POSITION.TOP_CENTER});
+			console.error(error);
 		}
 	};
 
@@ -65,6 +69,24 @@ function Signup() {
 					}}
 				/>
 
+				<br />
+				<img
+					alt="Profile pic"
+					width="150px"
+					height="125px"
+					src={image ? URL.createObjectURL(image) : ""}
+				></img>
+
+				<br />
+				<input
+					type="file"
+					name="image"
+					onChange={(e) => {
+						setImage(e.target.files[0]);
+					}}
+				/>
+
+				<br />
 				<div className="buttons">
 					<button className="signup-button" onClick={handleSignup}>
 						Signup

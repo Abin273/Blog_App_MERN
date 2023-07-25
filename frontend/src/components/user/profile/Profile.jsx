@@ -1,25 +1,38 @@
 import React from "react";
 import "./Profile.css";
 import { useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
+	const navigate = useNavigate()
 
-	const name = useSelector(state => state.user.name);
-	const email = useSelector(state => state.user.email);
+	const user = useSelector(state => state.user.userInfo);
+	const handleSubmit = (e)=>{
+		e.preventDefault();
+	}
+
 	return (
 		<div className="container">
 			<h1>Your Profile</h1>
-			<div class="profile-container">
-				<div class="profile-image">
+			<div className="profile-container">
+				<div className="profile-image">
 					<img src="profile.jpg" alt="User Profile Image" />
 				</div>
-				<div class="profile-details">
-					<h2>{name}</h2>
-					<p>{email}</p>
+				
+				<div className="profile-details">
+					<h2>{user.userName}</h2>
+					<p>{user.email}</p>
 				</div>
-				<div class="edit-button">
-					<button>Edit</button>
+				<div className="edit-button">
+					<button onClick={()=>{navigate('/user/editProfile')}}>Edit</button>
 				</div>
+				<form onSubmit={handleSubmit} >
+					<div className="" style={{display:"block"}}>
+					Add a profile image
+					<input type="file" name="image" />
+					<input type="submit" value="Upload" />
+					</div>
+				</form>
 			</div>
 		</div>
 	);

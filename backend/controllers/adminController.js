@@ -3,13 +3,16 @@ import bcrypt from "bcrypt";
 import { generateAdminToken } from "../utils/generateToken.js";
 import User from "../models/userModel.js";
 
-// REGISTER ADMIN
+// @desc   signup admin
+// @route  POST /api/admin/signup
+// @access Public
 export const signUp = async (req, res) => {
 	try {
 		const { adminName, email, password } = req.body;
 		const isAdminExist = await Admin.findOne({ email: email });
 		if (isAdminExist) {
-			return res.status(400).json({ error: "admin already exist" });
+			res.status(400);
+			throw new Error("admin already exist");
 		}
 
 		const saltRounds = 10;
@@ -33,7 +36,9 @@ export const signUp = async (req, res) => {
 	}
 };
 
-//LOGGIN ADMIN
+// @desc   login admin
+// @route  POST /api/admin/login
+// @access Public
 export const loggIn = async (req, res) => {
 	try {
 		const { email, password } = req.body;
@@ -42,10 +47,13 @@ export const loggIn = async (req, res) => {
 			return res.status(400).json({ error: "Invalid Credentials!" });
 
 		const isMatch = await bcrypt.compare(password, admin.password);
-		if (!isMatch)
-			return res.status(400).json({ error: "invalid name or password" });
-
+		if (!isMatch){
+			res.status(400);
+			throw new Error("invalid name or password")
+		}
+			
 		const adminWithoutSensitiveData = {
+			id:admin._id,
 			adminName: admin.adminName,
 			email: admin.email,
 		};
@@ -60,16 +68,21 @@ export const loggIn = async (req, res) => {
 	}
 };
 
+// @desc   get all users
+// @route  GET /api/admin/allUsers
+// @access Private
 export const getAllUsers = async (req, res) => {
 	try {
-		// console.log(req.admin,"kkkkkkkkkkk");
-		const users = await User.find({});
+		const users = await User.find({}).lean().select("-password");
 		res.status(200).json({ users });
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
 };
 
+// @desc   block or unblock a user
+// @route  PUT /api/admin/handleBlock/:id
+// @access Private
 export const blockUnblockUser = async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -77,14 +90,15 @@ export const blockUnblockUser = async (req, res) => {
 		console.log(user);
 		user.isBlocked = !user.isBlocked;
 		const afterUpdate = await user.save();
-		res.status(200).json({ message: `${afterUpdate.isBlocked ? "blocked" : "unblocked"}`,user:afterUpdate })
+		res.status(200).json({ message: `${afterUpdate.isBlocked ? "blocked" : "unblocked"}`,users:afterUpdate })
 	} catch (err) {
 		res.status(404).json({ error: err.message })
 	}
-
 }
 
-//LOGOUT ADMIN
+// @desc   logout admin
+// @route  POST /api/admin/logout
+// @access Public
 export const logOut = async (req, res) => {
 	try {
 		res.cookie("jwtAdmin", "", {

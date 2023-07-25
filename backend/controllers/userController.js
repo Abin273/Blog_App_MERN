@@ -7,7 +7,9 @@ import { generateToken } from "../utils/generateToken.js";
 // @access Public
 export const signUp = async (req, res) => {
 	try {
-		const { userName, email, password } = req.body;
+		const { userName, email, password} = req.body;
+		console.log("Hi");
+		console.log(req.files);
 		const isUserExist = await User.findOne({ email: email });
 		if (isUserExist) {
 			res.status(400);
@@ -20,6 +22,7 @@ export const signUp = async (req, res) => {
 			userName,
 			email,
 			password: hashPassword,
+			image:image.filename
 		});
 		const userWithoutSensitiveData = {
 			userName: user.userName,

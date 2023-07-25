@@ -2,7 +2,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background-color: #442b76;
+	background-color: #885cdf;
 	padding-left: 100px;
 	padding: 10px;
 }
@@ -11,6 +11,11 @@
 	margin-left: 80px;
 	font-size: 24px;
 	font-weight: bold;
+	cursor: pointer;
+}
+.user-name a{
+	color: #fff;
+	text-decoration: none;
 }
 
 .right-side-part {
@@ -36,8 +41,13 @@
 
 .nav-items {
 	color: #fff;
+	cursor: pointer;
 }
 
 .navbar-links a:hover {
-	color: #007bff;
+	color: #bad6f5;
+}
+
+.active{
+	color: red;
 }

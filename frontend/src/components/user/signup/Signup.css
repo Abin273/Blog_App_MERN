@@ -2,7 +2,7 @@
 .container {
     width: 100%;
     max-width: 600px;
-    height: 100vh;
+    height: 77vh;
     margin: 0 auto; 
     display: flex; /* Enable flexbox layout on the body */
   justify-content: center; /* Horizontally center the child elements */
