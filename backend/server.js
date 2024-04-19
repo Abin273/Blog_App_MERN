@@ -9,7 +9,6 @@ import path, { dirname } from 'path';
 import connectDb from "./config/db.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
-import blogRoutes from "./routes/blogRoutes.js";
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
 const app = express();
@@ -24,7 +23,7 @@ app.use(cors({
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true })); //for parsing form data
 app.use(express.json()); //for parsing json
-app.use(cookieParser());
+app.use(cookieParser()); // for parsing cookie data
 
 connectDb();
 
@@ -37,9 +36,6 @@ app.use("/api/user", userRoutes);
 
 //admin router assigning
 app.use("/api/admin", adminRoutes);
-
-//blog router assigning
-app.use("/api/blog", blogRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

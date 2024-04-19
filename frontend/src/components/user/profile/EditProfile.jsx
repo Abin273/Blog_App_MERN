@@ -36,9 +36,6 @@ function EditProfile() {
     <div className="container">
 			<h1>Edit Profile</h1>
 			<div className="profile-container">
-				<div className="profile-image">
-					<img src="profile.jpg" alt="User Profile Image" />
-				</div>
 				<div className="profile-details">
 				<input
 					className="input"
