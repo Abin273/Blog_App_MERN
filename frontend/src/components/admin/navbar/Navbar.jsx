@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Navbar.css" 
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +11,10 @@ function Navbar() {
 	const { adminName } = useSelector((state) => state.admin.adminInfo);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+
+	useEffect(()=>{
+		document.title = "User management admin"
+	},[])
 	
 	const handleLogout = async () => {
 		try {
