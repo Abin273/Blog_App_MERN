@@ -1,28 +1,25 @@
 import User from "../models/userModel.js";
-import bcrypt from "bcrypt";
 import { generateToken } from "../utils/generateToken.js";
+import { checkPasswordIsCorrect, generateHastedPassword } from "../utils/password.js";
 
 // @desc   signup user
 // @route  POST /api/user/signup
 // @access Public
 export const signUp = async (req, res) => {
 	try {
-		const { userName, email, password} = req.body;
-		console.log("Hi");
-		console.log(req.files);
+		const { userName, email, password, image } = req.body;
 		const isUserExist = await User.findOne({ email: email });
 		if (isUserExist) {
 			res.status(400);
 			throw new Error("user already exist");
 		}
 
-		const saltRounds = 10;
-		const hashPassword = await bcrypt.hash(password, saltRounds);
+		const hashPassword = await generateHastedPassword(password)
 		const user = await User.create({
 			userName,
 			email,
 			password: hashPassword,
-			image:image.filename
+			image:image
 		});
 		const userWithoutSensitiveData = {
 			userName: user.userName,
@@ -44,30 +41,25 @@ export const signUp = async (req, res) => {
 export const loggIn = async (req, res) => {
 	try {
 		const { email, password } = req.body;
-		const user = await User.findOne({ email: email });
+		const user = await User.findOne({ email: email }).lean();
 		if (!user)
 			return res.status(401).json({ error: "Invalid Credentials!" });
 
 		if (user.isBlocked)
-			return res.status(403).json({ error: "your account is blocked." });
+			return res.status(403).json({ error: "your account has been blocked." });
 
-		const isMatch = await bcrypt.compare(password, user.password);
+		const isMatch = await checkPasswordIsCorrect(password, user.password)
 		if (!isMatch)
 			return res
 				.status(400)
-				.json({ error: "invalid userName or password" });
+				.json({ error: "Invalid Credentials!" });
 
-		const userWithoutSensitiveData = {
-			id: user._id,
-			userName: user.userName,
-			email: user.email,
-			isBlocked: user.isBlocked,
-		};
+		delete user.password
 
 		generateToken(res, user._id);
 		res.status(201).json({
 			message: "Loggined successfully...",
-			user: userWithoutSensitiveData,
+			user,
 		});
 	} catch (err) {
 		res.status(500).json({ error: err.message });
@@ -98,25 +90,22 @@ export const getUserProfile = async (req, res) => {
 // @access Private
 export const updateUserProfile = async (req, res) => {
 	try {
-		console.log(req.user, "kkkkkdfdsfs");
 		const user = await User.findById(req.user._id);
 
 		if (user) {
 			user.userName = req.body.userName || user.userName;
 			user.email = req.body.email || user.email;
+			user.image = req.body.image || user.image;
 			if (req.body.password) {
-				const saltRounds = 10;
-				const hashPassword = await bcrypt.hash(
-					req.body.password,
-					saltRounds
-				);
+				const hashPassword = await generateHastedPassword(req.body.password)
 				user.password = hashPassword;
 			}
 			const updatedUser = await user.save();
 			const userWithoutSensitiveData = {
-				id: updatedUser._id,
+				_id: updatedUser._id,
 				userName: updatedUser.userName,
 				email: updatedUser.email,
+				image: updatedUser.image,
 			};
 			res.status(200).json({
 				message: "user profile updated",

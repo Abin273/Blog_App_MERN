@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "../../components/user/navbar/Navbar";
-import UserHome from "../../components/user/adminHome/UserHome";
+import UserHome from "../../components/user/userHome/UserHome";
 
 function UserHomePage() {
 	return (

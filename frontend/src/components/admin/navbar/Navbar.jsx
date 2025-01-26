@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import "./Navbar.css" 
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { toast } from "react-toastify";
+import "./Navbar.css" 
 import { logout } from "../../../redux/adminSlice";
+import { toastMessage } from "../../../utils/toastMessage";
 
 function Navbar() {
 
@@ -19,11 +19,12 @@ function Navbar() {
 	const handleLogout = async () => {
 		try {
 			const { data } = await axios.post("/api/admin/logout");
-			toast.warn(data.message);
+			toastMessage(data.message, 'success')
+			
 			dispatch(logout());
 			navigate("/");
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	};
 	return (

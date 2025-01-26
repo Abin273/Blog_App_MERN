@@ -9,7 +9,6 @@ export const userAuth = async (req, res, next) => {
 	if (token) {
 		try {
 			const decoded = jwt.verify(token, process.env.JWT_SECRET);
-			console.log("decoded", decoded, "//////////", decoded.userId);
 			req.user = await User.findOne({ _id: decoded.id }).select("-password");
 			next();
 		} catch (error) {
@@ -29,7 +28,7 @@ export const adminAuth = async (req, res, next) => {
 	if (token) {
 		try {
 			const decoded = jwt.verify(token, process.env.JWT_ADMINSECRET);
-			req.admin = await Admin.findOne({ _id: decoded.id }).select("-password");
+			req.admin = decoded
 			next();
 		} catch (error) {
 			res.status(401).json({ error: "not autherized,invalid token" });

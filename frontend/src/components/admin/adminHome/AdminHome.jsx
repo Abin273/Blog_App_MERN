@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import "./AdminHome.css";
 import axios from "axios";
-import { toast } from "react-toastify";
+import "./AdminHome.css";
+import { toastMessage } from "../../../utils/toastMessage";
 
 function AdminHome() {
 	const [usersData, setUsersData] = useState([]);
@@ -10,14 +10,18 @@ function AdminHome() {
 
 	useEffect(() => {
 		(async () => {
-			const { data } = await axios.get("/api/admin/allUsers", {
-				withCredentials: true,
-			});
-			console.log("data", data);
-			console.log("data.users", data.users);
+			try {
+				const { data } = await axios.get("/api/admin/allUsers", {
+					withCredentials: true,
+				});
+				if(data){
+					setUsersData(data.users);
+					setfilteredUsersData(data.users);
+				}
+			} catch (error) {
+				toastMessage("failed to fetch users list", 'error')
+			}
 
-			setUsersData(data.users);
-			setfilteredUsersData(data.users);
 		})();
 	}, []);
 
@@ -38,12 +42,10 @@ function AdminHome() {
 					withCredentials: true,
 				}
 			);
-			// console.log("updatedUser", updatedUser);
-			toast.success(
-				updatedUser.data.users.isBlocked
-					? "User has blocked"
-					: "User has unBlocked"
-			);
+			toastMessage(updatedUser.data.users.isBlocked
+				? "User has blocked"
+				: "User has unBlocked", 'success')
+			
 			let users = usersData.map((user) => {
 				if (user._id === id) {
 					return {
@@ -59,7 +61,6 @@ function AdminHome() {
 		})();
 	};
 
-	console.log(usersData);
 	return (
 		<div className="home-container">
 			<h1>Users</h1>

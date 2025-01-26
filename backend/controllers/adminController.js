@@ -1,40 +1,5 @@
-import Admin from "../models/adminModel.js";
-import bcrypt from "bcrypt";
 import { generateAdminToken } from "../utils/generateToken.js";
 import User from "../models/userModel.js";
-
-// @desc   signup admin
-// @route  POST /api/admin/signup
-// @access Public
-export const signUp = async (req, res) => {
-	try {
-		const { adminName, email, password } = req.body;
-		const isAdminExist = await Admin.findOne({ email: email });
-		if (isAdminExist) {
-			res.status(400);
-			throw new Error("admin already exist");
-		}
-
-		const saltRounds = 10;
-		const hashPassword = await bcrypt.hash(password, saltRounds);
-		const admin = await Admin.create({
-			adminName,
-			email,
-			password: hashPassword,
-		});
-		const adminWithoutSensitiveData = {
-			adminName: admin.adminName,
-			email: admin.email,
-		};
-
-		res.status(201).json({
-			message: "admin added successfully...",
-			admin: adminWithoutSensitiveData,
-		});
-	} catch (err) {
-		res.status(500).json({ error: err.message });
-	}
-};
 
 // @desc   login admin
 // @route  POST /api/admin/login
@@ -42,23 +7,23 @@ export const signUp = async (req, res) => {
 export const loggIn = async (req, res) => {
 	try {
 		const { email, password } = req.body;
-		const admin = await Admin.findOne({ email: email });
-		if (!admin)
-			return res.status(400).json({ error: "Invalid Credentials!" });
+		const adminId = process.env.ADMIN_ID
 
-		const isMatch = await bcrypt.compare(password, admin.password);
-		if (!isMatch){
-			res.status(400);
-			throw new Error("invalid name or password")
+		const adminEmail = process.env.ADMIN_EMAIL
+		const adminPassword = process.env.ADMIN_PASSWORD
+
+		if(email !== adminEmail || password !== adminPassword){
+			return res.status(400).json({ error: "Invalid Credentials!" });
 		}
-			
+		
+		
 		const adminWithoutSensitiveData = {
-			id:admin._id,
-			adminName: admin.adminName,
-			email: admin.email,
+
+			adminName: "admin",
+			email,
 		};
 
-		generateAdminToken(res, admin._id);
+		generateAdminToken(res, adminId);
 		res.status(201).json({
 			message: "Loggined successfully...",
 			admin: adminWithoutSensitiveData,
@@ -73,7 +38,7 @@ export const loggIn = async (req, res) => {
 // @access Private
 export const getAllUsers = async (req, res) => {
 	try {
-		const users = await User.find({}).lean().select("-password");
+		const users = await User.find({}).select("-password").lean();
 		res.status(200).json({ users });
 	} catch (err) {
 		res.status(500).json({ error: err.message });
@@ -87,7 +52,6 @@ export const blockUnblockUser = async (req, res) => {
 	try {
 		const { id } = req.params;
 		const user = await User.findById(id).select('-password');
-		console.log(user);
 		user.isBlocked = !user.isBlocked;
 		const afterUpdate = await user.save();
 		res.status(200).json({ message: `${afterUpdate.isBlocked ? "blocked" : "unblocked"}`,users:afterUpdate })

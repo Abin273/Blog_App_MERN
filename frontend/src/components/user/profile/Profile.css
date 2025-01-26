@@ -57,3 +57,8 @@ div > p {
 .edit-button button:hover {
 	background-color: #0056b3;
 }
+
+.submitbutton input:hover{
+	cursor: pointer;
+
+}

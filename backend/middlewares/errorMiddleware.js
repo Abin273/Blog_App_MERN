@@ -5,7 +5,7 @@ export const notFound = (req,res,next)=>{
 }
 
 export const errorHandler = (err,req,res,next)=>{
-    let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    let statusCode = res.statusCode ?? 500;
     let message = err.message;
 
     if(err.name === 'CastError' && err.kind === 'ObjectId'){  //CastError is a  mongoose error

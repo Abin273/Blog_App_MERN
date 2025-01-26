@@ -8,7 +8,6 @@ export const adminSlice = createSlice({
     reducers:{
         login:(state,action)=>{
             state.adminInfo = action.payload;
-            console.log("admin slice state",action.payload);
             localStorage.setItem("adminInfo",JSON.stringify(action.payload))
         },
 
