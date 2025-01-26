@@ -24,6 +24,7 @@ function EditProfile() {
 	const handleUpdate = async (e)=>{
 		e.preventDefault()
 		const response = await axios.put("/api/user/profile",updatedUser,{withCredentials:true});
+		delete updatedUser.password
 		dispatch(update(updatedUser));
 		toastMessage(response.data.message, "success");
 		navigate("/user/profile")
